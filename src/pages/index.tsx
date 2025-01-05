@@ -8,25 +8,28 @@ import fetchRandomBooks from "@/lib/fetch-random-books";
 
 // SSR 방식으로 사전 렌더링
 export const getServerSideProps = async () => {
-  const allBooks = await fetchBooks();
-  const recommendBooks = await fetchRandomBooks();
+  // Promise.all 메서드는 인수로 전달한 배열 안에 들어있는 모든 비동기 함수들을 동시에 처리
+  const [allBooks, recoBooks] = await Promise.all([
+    fetchBooks(),
+    fetchRandomBooks(),
+  ]);
   return {
     props: {
       allBooks,
-      recommendBooks,
+      recoBooks,
     },
   };
 };
 
 export default function Home({
   allBooks,
-  recommendBooks,
+  recoBooks,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return (
     <div className={style.container}>
       <section>
         <h3>지금 추천하는 도서</h3>
-        {recommendBooks.map((book) => (
+        {recoBooks.map((book) => (
           <BookItem key={book.id} {...book} />
         ))}
       </section>
